@@ -18,3 +18,9 @@ You just need to clone it in a directory, and then source `zsh-theme.plugin.zsh`
 git clone https://github.com/abhiyandhakal/zsh-theme.git ~/zsh-theme
 echo source ~/zsh-theme/zsh-theme.plugin.zsh >> ~/.zshrc
 ```
+
+## Git Features
+1. Git Branch
+2. Staged Files Count
+3. Unstaged Files Count
+4. Untracked Files Count
