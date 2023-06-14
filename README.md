@@ -1,4 +1,4 @@
-# zsh-theme
+# abhiyan.zsh - A ZSH Prompt Theme
 
 This is custom zsh theme that I created when looking for minimalism, away from [ohmyzsh](https://github.com/ohmyzsh/ohmyzsh), which is a great project, but a bloat in my opinion.
 
