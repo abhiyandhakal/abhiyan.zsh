@@ -4,9 +4,13 @@ local color2=#0ff
 local color3=#2d8
 local color4=#f80
 local color5=#efb974
+local color6=#fff
 
 autoload -Uz vcs_info
 setopt PROMPT_SUBST
+export VIRTUAL_ENV_DISABLE_PROMPT=1
+local venv_prompt=""
+
 
 function create_separator() {
 	local sep=""
@@ -14,6 +18,7 @@ function create_separator() {
 	local terminal_width=$(tput cols)
 	local prompt_len=${#${(%):---- %n-%m- - %2~ }}
 	local git_prompt_skel=""
+	local venv_prompt_skel=""
 
 	if git rev-parse --is-inside-work-tree >/dev/null 2>&1; then
 		local unstaged_count=$(git diff --numstat | wc -l)
@@ -36,10 +41,15 @@ function create_separator() {
 			git_prompt_skel+="${untracked_count}! "
 		fi
 	fi
+	
+	if [ "$VIRTUAL_ENV" != "" ]; then
+		venv_prompt_skel+="$(basename $VIRTUAL_ENV) "
+	fi
 
 	local git_prompt_len=${#git_prompt_skel}
+	local venv_prompt_len=${#venv_prompt_skel}
 
-	separator_len=$((terminal_width - prompt_len - git_prompt_len))
+	separator_len=$((terminal_width - prompt_len - git_prompt_len - venv_prompt_len))
 
 	for ((i=0; i < separator_len; i++)); do
 		sep+="󰍴"
@@ -79,11 +89,22 @@ precmd() {
 		git_prompt=""
 	fi
 
+	local venv_name=""
+	venv_prompt=""
+	if [[ -n "$VIRTUAL_ENV" ]]; then
+		venv_name=$(basename $VIRTUAL_ENV)
+		if [[ -n "$git_prompt" ]]; then
+			venv_prompt+="%F{$color5}%K{$color6}%K{$color6}%F{black}%B$venv_name "
+		else
+			venv_prompt+="%K{black}%F{$color6}%K{$color6}%F{black}%B$venv_name "
+		fi
+	fi
+
 	prompt_top="╭──%B%F{black}%K{${color1}} %n%K{${color2}}%F{${color1}}%F{black}%m%f%k%F{${color2}} %B%F{yellow}%F{${color3}} %b%2~ %f"
-	prompt_below="%f╰──${prompt_char}%f "
+	prompt_below="%f╰──${prompt_char}%f"
 }
 
-PROMPT='${prompt_top}%F{#644}$(create_separator)$git_prompt%f%k%b
-${prompt_below}'
+PROMPT='${prompt_top}%F{#644}$(create_separator)$git_prompt$venv_prompt%f%k%b
+${prompt_below} '
 
-RPROMPT='%F{#f00}$(if [ $? -ne 0 ]; then echo "󰌑%? "; fi)%f $(date "+%I:%M:%S %p")'
+RPROMPT='%F{#f00}$(if [ $? -ne 0 ]; then echo "󰌑%? "; fi)%f $(date "+%H:%M:%S")'
