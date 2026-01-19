@@ -20,7 +20,7 @@ function create_separator() {
 	local git_prompt_skel=""
 	local venv_prompt_skel=""
 
-	if git rev-parse --is-inside-work-tree >/dev/null 2>&1; then
+	if [[ "$(git rev-parse --is-inside-work-tree 2>/dev/null)" == "true" ]]; then
 		local unstaged_count=$(git diff --numstat | wc -l)
 		local staged_count=$(git diff --cached --numstat | wc -l)
 		local untracked_count=$(git ls-files --others --exclude-standard | wc -l)
@@ -61,7 +61,7 @@ function create_separator() {
 precmd() {
 	vcs_info
 
-	if git rev-parse --is-inside-work-tree >/dev/null 2>&1; then
+	if [[ "$(git rev-parse --is-inside-work-tree 2>/dev/null)" == "true" ]]; then
 		prompt_char="○ ⚡"
 
 		local unstaged_count=$(git diff --numstat | wc -l)
