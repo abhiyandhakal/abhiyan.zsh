@@ -5,6 +5,7 @@ local color3=#2d8
 local color4=#f80
 local color5=#efb974
 local color6=#fff
+local color7=#efb974
 
 autoload -Uz vcs_info
 setopt PROMPT_SUBST
@@ -18,6 +19,7 @@ function create_separator() {
 	local terminal_width=$(tput cols)
 	local prompt_len=${#${(%):---- %n-%m- - %2~ }}
 	local git_prompt_skel=""
+	local git_bare_skel=""
 	local venv_prompt_skel=""
 
 	if [[ "$(git rev-parse --is-inside-work-tree 2>/dev/null)" == "true" ]]; then
@@ -41,6 +43,17 @@ function create_separator() {
 			git_prompt_skel+="${untracked_count}! "
 		fi
 	fi
+
+	if [[ "$(git rev-parse --is-bare-repository 2>/dev/null)" == "true" ]]; then
+		local current_branch=$(git branch --show-current)
+		local worktree_count=$(($(git worktree list | wc -l) - 1))
+
+		if [[ "${worktree_count}" == "0" ]]; then
+			git_bare_skel+="  ${current_branch} "
+		else
+			git_bare_skel+="  (${worktree_count}) ${current_branch} "
+		fi
+	fi
 	
 	if [ "$VIRTUAL_ENV" != "" ]; then
 		venv_prompt_skel+="$(basename $VIRTUAL_ENV) "
@@ -48,8 +61,9 @@ function create_separator() {
 
 	local git_prompt_len=${#git_prompt_skel}
 	local venv_prompt_len=${#venv_prompt_skel}
+	local git_bare_len=${#git_bare_skel}
 
-	separator_len=$((terminal_width - prompt_len - git_prompt_len - venv_prompt_len))
+	separator_len=$((terminal_width - prompt_len - git_prompt_len - venv_prompt_len - git_bare_len))
 
 	for ((i=0; i < separator_len; i++)); do
 		sep+="󰍴"
@@ -60,6 +74,7 @@ function create_separator() {
 
 precmd() {
 	vcs_info
+	git_bare_prompt=""
 
 	if [[ "$(git rev-parse --is-inside-work-tree 2>/dev/null)" == "true" ]]; then
 		prompt_char="○ ⚡"
@@ -89,11 +104,27 @@ precmd() {
 		git_prompt=""
 	fi
 
+	if [[ "$(git rev-parse --is-bare-repository 2>/dev/null)" == "true" ]]; then
+		prompt_char="○ ⚡"
+		local current_branch=$(git branch --show-current)
+		local worktree_count=$(($(git worktree list | wc -l) - 1))
+
+		git_bare_prompt="%B%F{$color7}%K{$color7}%F{black}%F{black} "
+
+		if [[ "${worktree_count}" == "0" ]]; then
+			git_bare_prompt+="${current_branch} "
+		else
+			git_bare_prompt+="(${worktree_count}) ${current_branch} "
+		fi
+	else
+		git_bare_prompt=""
+	fi
+
 	local venv_name=""
 	venv_prompt=""
 	if [[ -n "$VIRTUAL_ENV" ]]; then
 		venv_name=$(basename $VIRTUAL_ENV)
-		if [[ -n "$git_prompt" ]]; then
+		if [[ -n "$git_prompt" || -n "$git_bare_prompt" ]]; then
 			venv_prompt+="%F{$color5}%K{$color6}%K{$color6}%F{black}%B$venv_name "
 		else
 			venv_prompt+="%K{black}%F{$color6}%K{$color6}%F{black}%B$venv_name "
@@ -104,7 +135,7 @@ precmd() {
 	prompt_below="%f╰──${prompt_char}%f"
 }
 
-PROMPT='${prompt_top}%F{#644}$(create_separator)$git_prompt$venv_prompt%f%k%b
+PROMPT='${prompt_top}%F{#644}$(create_separator)$git_prompt$git_bare_prompt$venv_prompt%f%k%b
 ${prompt_below} '
 
 RPROMPT='%F{#f00}$(if [ $? -ne 0 ]; then echo "󰌑%? "; fi)%f $(date "+%H:%M:%S")'
