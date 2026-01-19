@@ -17,7 +17,8 @@ function create_separator() {
 	local sep=""
 
 	local terminal_width=$(tput cols)
-	local prompt_len=${#${(%):---- %n-%m- - %2~ }}
+	local prompt_skel="╭── %n%m  %2~ "
+	local prompt_len=${#${(%):-$prompt_skel}}
 	local git_prompt_skel=""
 	local git_bare_skel=""
 	local venv_prompt_skel=""
@@ -62,8 +63,13 @@ function create_separator() {
 	local git_prompt_len=${#git_prompt_skel}
 	local venv_prompt_len=${#venv_prompt_skel}
 	local git_bare_len=${#git_bare_skel}
+	local bare_adjust=0
 
-	separator_len=$((terminal_width - prompt_len - git_prompt_len - venv_prompt_len - git_bare_len))
+	if ((git_bare_len > 0)); then
+		bare_adjust=1
+	fi
+
+	separator_len=$((terminal_width - prompt_len - git_prompt_len - venv_prompt_len - git_bare_len + bare_adjust))
 
 	for ((i=0; i < separator_len; i++)); do
 		sep+="󰍴"
