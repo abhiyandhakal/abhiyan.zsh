@@ -1,26 +1,32 @@
 # abhiyan.zsh - A ZSH Prompt Theme
 
-This is custom zsh theme that I created when looking for minimalism, away from [ohmyzsh](https://github.com/ohmyzsh/ohmyzsh), which is a great project, but a bloat in my opinion.
+A lightweight Zsh prompt theme focused on a clean two-line layout with Git and virtualenv context.
+
+Listed in the themes section of [awesome-zsh-plugins](https://github.com/unixorn/awesome-zsh-plugins).
 
 ![zsh-theme-preview](https://github.com/abhiyandhakal/abhiyan.zsh/blob/master/zsh-theme.png)
 
+## Features
+
+- Two-line prompt with user, host, and current directory
+- Git work-tree info: branch, staged, unstaged, and untracked counts
+- Bare-repo indicator with worktree count
+- Python virtualenv name when active
+- Right prompt shows last exit status (on error) and time
+
 ## Requirements
 
-Your terminal should support [powerline fonts](https://github.com/powerline/fonts). You can install the package as follows (the exact name of the package varies from distro to distro):
+Your terminal should support a Nerd Font or Powerline-compatible font (for the glyphs used in the prompt). You can install a Powerline font as follows (package name varies by distro):
 
-**ArchLinux**: sudo pacman -S powerline-fonts
-**Debian/Ubuntu**: sudo apt install fonts-powerline
+**Arch Linux**: `sudo pacman -S powerline-fonts`
+
+**Debian/Ubuntu**: `sudo apt install fonts-powerline`
 
 ## Installation
 
-You just need to clone it in a directory, and then source `zsh-theme.plugin.zsh`. For example,
-```
+Clone the repo and source the plugin file from your `~/.zshrc`:
+
+```sh
 git clone https://github.com/abhiyandhakal/abhiyan.zsh.git ~/zsh-theme
 echo source ~/zsh-theme/zsh-theme.plugin.zsh >> ~/.zshrc
 ```
-
-## Git Features
-1. Git Branch
-2. Staged Files Count
-3. Unstaged Files Count
-4. Untracked Files Count
